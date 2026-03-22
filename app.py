@@ -8,7 +8,7 @@ import urllib.parse
 # --- 1. CONFIGURAÇÃO E TEMA DARK ---
 st.set_page_config(page_title="Gestão NR 13 - F.A Engenharia", layout="wide", initial_sidebar_state="collapsed")
 
-# Estilização: Tema Dark, Marca d'água e Branding
+# CSS para Branding e Visual Profissional
 st.markdown("""
     <style>
     .stApp { background-color: #0E1117; color: #FFFFFF; }
@@ -20,7 +20,7 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 # --- 2. INICIALIZAÇÃO DE DADOS (PERSISTÊNCIA) ---
-hoje = datetime(2026, 3, 22)
+hoje_str = "22/03/2026"
 
 if 'db_ativos' not in st.session_state:
     st.session_state['db_ativos'] = pd.DataFrame({
@@ -53,7 +53,6 @@ with st.sidebar:
         setor_cl = st.text_input("Setor", "Utilidades")
         resp_cl = st.text_input("Responsável", "Eng. Felipe Alves")
         email_dest = st.text_input("E-mail Alertas", "eng.alvescs@gmail.com")
-        api_ia = st.text_input("Chave API IA", type="password")
     st.divider()
     st.caption("Felipe Alves Consultoria e Serviços")
 
@@ -61,10 +60,10 @@ with st.sidebar:
 col_t, col_c = st.columns([2.5, 1.5])
 with col_t:
     st.title(f"🛡️ Gestão NR 13 - {emp_n}")
-    st.caption(f"Felipe Alves Consultoria e Serviços | Responsável: {resp_cl}")
+    st.caption(f"Felipe Alves Consultoria e Serviços | Data do Sistema: {hoje_str}")
 
 with col_c:
-    st.markdown(f"""
+    st.markdown("""
     <div class="contact-card">
         <b>Felipe Alves Consultoria e Serviços</b><br>
         📞 <b>(81) 99753-8656</b><br>
@@ -72,35 +71,7 @@ with col_c:
     </div>
     """, unsafe_allow_html=True)
 
-# --- 5. DASHBOARD EXECUTIVO AVANÇADO ---
+# --- 5. DASHBOARD EXECUTIVO ---
 st.divider()
 c1, c2, c3, c4 = st.columns(4)
-c1.metric("📦 Ativos Cadastrados", len(st.session_state['db_ativos']), "12 novos", border=True)
-c2.metric("🗓️ Inspeções a Vencer", "18", "-3", delta_color="normal", border=True)
-c3.metric("⚠️ Alertas Críticos", "8", "+2", delta_color="inverse", border=True)
-c4.metric("✅ Conformidade NR 13", "88%", "3.5%", chart_data=[80, 85, 84, 88], chart_type="area", border=True)
-
-# --- 6. FUNCIONALIDADES (ABAS) ---
-tabs = st.tabs(["📊 Gestão Técnica", "📜 Histórico de Auditoria", "🔧 Recomendações", "🌡️ Instrumentos", "📁 Documentos"])
-
-with tabs[0]:
-    st.subheader("Edição Manual e Salvamento")
-    df_antes = st.session_state['db_ativos'].copy()
-    
-    # Editor de dados (Tabela de 16 colunas)
-    edited_df = st.data_editor(st.session_state['db_ativos'], use_container_width=True, num_rows="dynamic")
-    
-    if st.button("💾 Salvar Dados e Atualizar Histórico"):
-        tipo_acao = ""
-        detalhe = ""
-        
-        if len(edited_df) < len(df_antes):
-            tipo_acao, detalhe = "Deleção", f"Removido(s) {len(df_antes) - len(edited_df)} item(ns)"
-        elif len(edited_df) > len(df_antes):
-            tipo_acao, detalhe = "Adição", f"Adicionado(s) {len(edited_df) - len(df_antes)} novo(s) item(ns)"
-        elif not edited_df.equals(df_antes):
-            tipo_acao, detalhe = "Modificação", "Alteração técnica de dados na planilha"
-            
-        if tipo_acao:
-            st.session_state['db_ativos'] = edited_df
-            nova_log = pd.DataFrame([{"Data/Hora":
+c1.metric("📦 Ativos Totais", len(st.session_state['db_
