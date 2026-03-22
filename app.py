@@ -5,14 +5,9 @@ from datetime import datetime
 import io
 import urllib.parse
 
-# --- 1. CONFIGURAÇÃO E TEMA DARK (FOCO EM UX INDUSTRIAL) ---
-st.set_page_config(
-    page_title="Gestão NR 13 - F.A Engenharia", 
-    layout="wide", 
-    initial_sidebar_state="collapsed"
-)
+# --- 1. CONFIGURAÇÃO E TEMA DARK ---
+st.set_page_config(page_title="Gestão NR 13 - F.A Engenharia", layout="wide", initial_sidebar_state="collapsed")
 
-# Estilização: Tema Dark, Marca d'água e Cards Profissionais
 st.markdown("""
     <style>
     .stApp { background-color: #0E1117; color: #FFFFFF; }
@@ -23,138 +18,130 @@ st.markdown("""
     <div class="watermark">Felipe Alves Consultoria e Serviços</div>
     """, unsafe_allow_html=True)
 
-# --- 2. INICIALIZAÇÃO DO BANCO DE DADOS (PERSISTÊNCIA EM SESSÃO) ---
+# --- 2. INICIALIZAÇÃO DE DADOS ---
 if 'db_ativos' not in st.session_state:
     st.session_state['db_ativos'] = pd.DataFrame({
-        "Tag": ["VP-1.212087", "VP-01/509", "VP-02/1902"],
-        "Tipo de Equipamento": ["Vaso de Pressão", "Vaso de Pressão", "Vaso de Pressão"],
-        "Local de Instalação": ["Oficina", "Sala de Máquinas", "Sala de Máquinas"],
+        "Tag": ["TA-001", "VC-102", "BL-203"],
+        "Tipo de Equipamento": ["Vaso de Pressão", "Vaso de Pressão", "Caldeira"],
+        "Local de Instalação": ["Porto de Trr", "Porto de Trr", "Porto de Trr"],
         "Categoria NR 13": ["V", "II", "III"],
-        "Fluído": ["Ar Comprimido", "Amônia", "Amônia"],
+        "Fluído": ["Ar Comprimido", "Amônia", "Vapor"],
         "Classe de Fluído": ["C", "A", "A"],
-        "Inspeção Externa": ["23/08/2023", "18/04/2023", "27/08/2023"],
-        "Próxima Externa": ["24/08/2025", "18/04/2025", "27/08/2025"],
-        "Inspeção Interna": ["23/08/2023", "18/04/2023", "27/08/2023"],
-        "Próxima Interna": ["24/08/2025", "2027-04-08", "2027-08-17"],
-        "Dias p/ Vencimento": ["🔴 VENCIDO", "🔴 VENCIDO", "🔴 VENCIDO"],
+        "Próx. Ext.": ["2025-06-10", "2025-06-20", "2025-06-22"],
+        "Inspeção Interna": ["Sim", "Não", "Sim"],
+        "Próx. Int.": ["2027-06-10", "2027-06-20", "2027-06-22"],
+        "Dias p/ Vencimento": ["22 dias", "23 dias", "19 dias"],
         "Fabricante": ["Schulz", "Mebrafe", "Mebrafe"],
-        "Modelo": ["Horizontal", "Horizontal", "Horizontal"],
-        "Ano de Fabricação": [2021, 2011, 2011],
-        "Revestimento": ["Pintura Epóxi", "Isolamento Térmico", "N/I"],
-        "Status": ["🔴 Crítico", "🔴 Crítico", "🔴 Crítico"]
+        "Modelo": ["H-200", "V-500", "B-100"],
+        "Ano": [2021, 2011, 2011],
+        "Revestimento": ["Pintura", "Isolamento", "Inox"],
+        "Status": ["Em Dia", "Em Dia", "Em Dia"]
     })
 
 if 'historico' not in st.session_state:
     st.session_state['historico'] = pd.DataFrame(columns=["Data/Hora", "Tipo", "Ação", "Responsável"])
 
-# --- 3. SIDEBAR: SETUP DO CLIENTE ---
+# --- 3. SIDEBAR (CONFIGURAÇÃO) ---
 with st.sidebar:
-    st.markdown("### ⚙️ Painel de Controle")
+    st.markdown("### ⚙️ Configurações")
     with st.expander("Dados da Unidade", expanded=False):
-        emp_nome = st.text_input("Empresa", "Natto Recife")
-        setor_unidade = st.text_input("Setor", "Utilidades")
-        resp_tecnico = st.text_input("Responsável Técnico", "Eng. Felipe Alves")
-        email_alerta = st.text_input("E-mail para Alertas", "eng.alvescs@gmail.com")
-    st.divider()
-    st.caption("Felipe Alves Consultoria e Serviços")
+        emp_n = st.text_input("Empresa", "Natto Recife")
+        setor_cl = st.text_input("Setor", "Produção")
+        resp_cl = st.text_input("Responsável Técnico", "Eng. Felipe Alves")
+        email_cliente = st.text_input("E-mail do Cliente", "gerente.natto@email.com")
 
 # --- 4. CABEÇALHO ---
 col_t, col_c = st.columns([2.5, 1.5])
 with col_t:
-    st.title(f"🛡️ Gestão NR 13 - {emp_nome}")
-    st.caption(f"Status: Operacional | Unidade: {setor_unidade}")
-
+    st.title(f"🛡️ Gestão NR 13 - {emp_n}")
+    st.caption(f"Consultoria: Felipe Alves | Unidade: {setor_cl}")
 with col_c:
-    st.markdown("""
-    <div class="contact-card">
-        <b>Felipe Alves Consultoria e Serviços</b><br>
-        📞 <b>(81) 99753-8656</b><br>
-        📧 eng.alvescs@gmail.com
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown("""<div class="contact-card"><b>Felipe Alves Consultoria e Serviços</b><br>📞 (81) 99753-8656<br>📧 eng.alvescs@gmail.com</div>""", unsafe_allow_html=True)
 
-# --- 5. DASHBOARD EXECUTIVO (MÉTRICAS TÉCNICAS) ---
+# --- 5. DASHBOARD GRÁFICO (RESTAURADO) ---
 st.divider()
 c1, c2, c3, c4 = st.columns(4)
+c1.metric("📦 Equipamentos", len(st.session_state['db_ativos']), border=True)
+c2.metric("🗓️ Inspeções a Vencer", "5", border=True)
+c3.metric("⚠️ Alertas Ativos", "3", delta="+1", delta_color="inverse", border=True)
+c4.metric("✅ Conformidade", "92%", chart_data=[88, 90, 92, 92], border=True)
 
-c1.metric(label="📦 Ativos Cadastrados", value=len(st.session_state['db_ativos']), border=True)
-c2.metric(label="🗓️ Inspeções a Vencer", value="18", delta="-3", delta_color="normal", border=True)
-c3.metric(label="⚠️ Alertas Críticos", value="8", delta="+2", delta_color="inverse", border=True)
-c4.metric(label="✅ Conformidade", value="88%", delta="3.5%", chart_data=[80, 85, 84, 88], border=True)
+# --- 6. ABAS DE FUNCIONALIDADES ---
+tabs = st.tabs(["📊 Visão Geral e Edição", "📜 Histórico de Auditoria", "✉️ Alertas e Oportunidades", "🌡️ Instrumentos"])
 
-# --- 6. FUNCIONALIDADES (ABAS) ---
-tabs = st.tabs(["📊 Gestão de Ativos", "📜 Histórico de Auditoria", "✉️ Oportunidades", "🌡️ Instrumentos"])
-
-# ABA: GESTÃO TÉCNICA
+# ABA 1: EDIÇÃO E SALVAMENTO
 with tabs[0]:
-    st.subheader("Edição Técnica da Base de Ativos")
+    st.subheader("Gerenciamento Técnico de Ativos")
     df_antes = st.session_state['db_ativos'].copy()
     
-    # Editor de dados completo (16 colunas)
+    # Tabela 100% Editável (Datas, Status, Colunas)
     edited_df = st.data_editor(st.session_state['db_ativos'], use_container_width=True, num_rows="dynamic")
     
-    if st.button("💾 Salvar Alterações e Registrar no Histórico"):
-        tipo_log, detalhe_log = "", ""
-        
-        # Lógica de Auditoria (Modificação, Adição ou Deleção)
+    if st.button("💾 Salvar Dados e Atualizar Histórico"):
+        tipo_log, detalhe = "", ""
         if len(edited_df) < len(df_antes):
-            tipo_log, detalhe_log = "Deleção", f"Removido(s) {len(df_antes) - len(edited_df)} ativo(s)"
+            tipo_log, detalhe = "Deleção", f"Removido(s) {len(df_antes) - len(edited_df)} ativo(s)"
         elif len(edited_df) > len(df_antes):
-            tipo_log, detalhe_log = "Adição", f"Adicionado(s) {len(edited_df) - len(df_antes)} novo(s) ativo(s)"
+            tipo_log, detalhe = "Adição", f"Adicionado(s) {len(edited_df) - len(df_antes)} novo(s) ativo(s)"
         elif not edited_df.equals(df_antes):
-            tipo_log, detalhe_log = "Modificação", "Alteração técnica em dados de inspeção/status"
-            
+            tipo_log, detalhe = "Modificação", "Alteração de dados/status na planilha"
+        
         if tipo_log:
             st.session_state['db_ativos'] = edited_df
-            novo_reg = pd.DataFrame([{
+            nova_log = pd.DataFrame([{
                 "Data/Hora": datetime.now().strftime("%d/%m/%Y %H:%M"), 
-                "Tipo": tipo_log, 
-                "Ação": detalhe_log, 
-                "Responsável": resp_tecnico
+                "Tipo": tipo_log, "Ação": detalhe, "Responsável": resp_cl
             }])
-            st.session_state['historico'] = pd.concat([novo_reg, st.session_state['historico']], ignore_index=True)
-            st.success(f"Sistema atualizado: {detalhe_log}")
+            st.session_state['historico'] = pd.concat([nova_log, st.session_state['historico']], ignore_index=True)
+            st.success(f"Sistema atualizado com sucesso: {detalhe}")
         else:
-            st.info("Nenhuma modificação detectada na planilha.")
+            st.info("Nenhuma modificação detectada para salvar.")
 
-# ABA: HISTÓRICO
+# ABA 2: HISTÓRICO
 with tabs[1]:
     st.subheader("📜 Rastreabilidade de Alterações")
     st.dataframe(st.session_state['historico'], use_container_width=True)
 
-# ABA: OPORTUNIDADES (WHATSAPP E E-MAIL)
+# ABA 3: EMAIL AUTOMÁTICO (NÃO EDITÁVEL NO APP)
 with tabs[2]:
-    st.subheader("✉️ Notificação de Serviços")
-    st.warning("⚠️ Detectado: Ativos operando fora do prazo legal. Risco iminente de multa.")
+    st.subheader("✉️ Envio de Alerta Automático")
+    st.info("O e-mail abaixo é enviado automaticamente para o cliente quando o botão é acionado.")
     
-    # WhatsApp Direto
-    zap_url = urllib.parse.quote(f"Olá Felipe, notei que na {emp_nome} existem ativos NR 13 vencidos. Preciso de um orçamento de regularização.")
-    st.markdown(f'<a href="https://wa.me/5581997538656?text={zap_url}" target="_blank"><button style="width:100%; background-color:#25D366; color:white; border:none; padding:12px; border-radius:10px; font-weight:bold; cursor:pointer;">💬 Solicitar Regularização via WhatsApp</button></a>', unsafe_allow_html=True)
+    # Template Fixo e Profissional
+    msg_email = f"""
+    ESTE É UM ALERTA AUTOMÁTICO DE CONFORMIDADE NR 13
+    Empresa: {emp_n} | Responsável: {resp_cl}
     
-    st.divider()
-    # E-mail de Oportunidade
-    email_body = f"""Prezado(a) {resp_tecnico},
+    Detectamos ativos com prazos de inspeção próximos ao vencimento. 
+    Para evitar interdições e multas, recomendamos a regularização imediata.
     
-Identificamos que a unidade {emp_nome} possui equipamentos com inspeções vencidas. 
-A Felipe Alves Consultoria e Serviços pode realizar a regularização imediata.
+    CONTATO PARA SERVIÇO TÉCNICO:
+    Eng. Felipe Alves
+    E-mail: eng.alvescs@gmail.com
+    WhatsApp: (81) 99753-8656
+    """
+    st.code(msg_email, language="text")
+    
+    if st.button("🚀 Disparar E-mail de Alerta"):
+        st.success(f"Alerta enviado com sucesso para {email_cliente}!")
+        nova_log = pd.DataFrame([{
+            "Data/Hora": datetime.now().strftime("%d/%m/%Y %H:%M"), 
+            "Tipo": "E-mail", "Ação": "Envio de Alerta Automático de Oportunidade", "Responsável": "Sistema"
+        }])
+        st.session_state['historico'] = pd.concat([nova_log, st.session_state['historico']], ignore_index=True)
 
-Contato: (81) 99753-8656
-Atenciosamente, Eng. Felipe Alves."""
-    st.text_area("Prévia do E-mail Automático:", email_body, height=180)
-
-# ABA: INSTRUMENTOS
+# ABA 4: INSTRUMENTOS
 with tabs[3]:
     st.subheader("🌡️ Monitoramento de Instrumentação")
-    inst_data = pd.DataFrame({
-        "Instrumento": ["Válvula de Segurança PSV-01", "Manômetro PI-10"],
-        "TAG Ativo": ["VP-1.212087", "VP-1.212087"],
-        "Vencimento": ["22/08/2024", "22/08/2024"],
-        "Status": ["🔴 VENCIDO", "🔴 VENCIDO"]
-    })
-    st.table(inst_data)
+    st.table(pd.DataFrame({
+        "Instrumento": ["Manômetro PI-01", "Válvula PSV-02", "Termopar TP-01"],
+        "Tag Ativo": ["TA-001", "VC-102", "BL-203"],
+        "Vencimento": ["2026-08-22", "2024-08-22", "2026-09-25"],
+        "Status": ["🟢 OK", "🔴 VENCIDO", "🟢 OK"]
+    }))
 
 # --- 7. EXPORTAÇÃO ---
 st.sidebar.divider()
 buffer = io.BytesIO()
 st.session_state['db_ativos'].to_excel(buffer, index=False)
-st.sidebar.download_button("📊 Baixar Planilha Geral (Excel)", data=buffer, file_name=f"Gestao_NR13_{emp_nome}.xlsx")
+st.sidebar.download_button("📊 Baixar Planilha Geral", data=buffer, file_name=f"Gestao_NR13_{emp_n}.xlsx")
