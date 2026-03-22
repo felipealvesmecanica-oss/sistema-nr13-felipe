@@ -12,7 +12,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Estilização Técnica Profissional
+# Estilização Técnica (Branding Felipe Alves Consultoria e Serviços)
 st.markdown("""
     <style>
     .stApp { background-color: #0E1117; color: #FFFFFF; }
@@ -23,7 +23,7 @@ st.markdown("""
     <div class="watermark">Felipe Alves Consultoria e Serviços</div>
     """, unsafe_allow_html=True)
 
-# --- 2. INICIALIZAÇÃO DO BANCO DE DADOS (16 COLUNAS) ---
+# --- 2. INICIALIZAÇÃO DE DADOS (16 COLUNAS TÉCNICAS) ---
 if 'db_ativos' not in st.session_state:
     st.session_state['db_ativos'] = pd.DataFrame({
         "Tag": ["VP-1.212087", "VP-01/509", "VP-02/1902"],
@@ -32,10 +32,10 @@ if 'db_ativos' not in st.session_state:
         "Categoria NR 13": ["V", "II", "III"],
         "Fluído": ["Ar Comprimido", "Amônia", "Amônia"],
         "Classe de Fluído": ["C", "A", "A"],
-        "Inspeção Externa": ["23/08/2023", "18/04/2023", "27/08/2023"],
-        "Próxima Externa": ["24/08/2025", "18/04/2025", "27/08/2025"],
-        "Inspeção Interna": ["23/08/2023", "18/04/2023", "27/08/2023"],
-        "Próxima Interna": ["24/08/2025", "2027-04-08", "2027-08-17"],
+        "Inspeção Externa": ["2023-08-23", "2023-04-18", "2023-08-27"],
+        "Próxima Externa": ["2025-08-24", "2025-04-18", "2025-08-27"],
+        "Inspeção Interna": ["2023-08-23", "2023-04-18", "2023-08-27"],
+        "Próxima Interna": ["2025-08-24", "2027-04-08", "2027-08-17"],
         "Dias p/ Vencimento": ["🔴 VENCIDO", "🔴 VENCIDO", "🔴 VENCIDO"],
         "Fabricante": ["Schulz", "Mebrafe", "Mebrafe"],
         "Modelo": ["Horizontal", "Horizontal", "Horizontal"],
@@ -49,20 +49,20 @@ if 'historico' not in st.session_state:
 
 # --- 3. SIDEBAR: SETUP DO CLIENTE ---
 with st.sidebar:
-    st.markdown("### ⚙️ Painel de Configuração")
-    with st.expander("Dados da Unidade", expanded=False):
-        emp_nome = st.text_input("Nome da Empresa", "Natto Recife")
-        setor_unidade = st.text_input("Setor", "Utilidades")
-        resp_tecnico = st.text_input("Responsável Técnico", "Eng. Felipe Alves")
-        email_alerta = st.text_input("E-mail para Alertas", "eng.alvescs@gmail.com")
+    st.markdown("### ⚙️ Painel de Controle")
+    with st.expander("Configuração da Planta", expanded=False):
+        emp_n = st.text_input("Empresa", "Natto Recife")
+        setor_cl = st.text_input("Setor", "Utilidades")
+        resp_cl = st.text_input("Responsável Técnico", "Eng. Felipe Alves")
+        email_dest = st.text_input("E-mail para Alertas", "eng.alvescs@gmail.com")
     st.divider()
     st.caption("Felipe Alves Consultoria e Serviços")
 
 # --- 4. CABEÇALHO ---
 col_t, col_c = st.columns([2.5, 1.5])
 with col_t:
-    st.title(f"🛡️ Gestão NR 13 - {emp_nome}")
-    st.caption(f"Status do Sistema: Operacional | Unidade: {setor_unidade}")
+    st.title(f"🛡️ Gestão NR 13 - {emp_n}")
+    st.caption(f"Unidade: {setor_cl} | Gestão Técnica Centralizada")
 
 with col_c:
     st.markdown("""
@@ -73,31 +73,4 @@ with col_c:
     </div>
     """, unsafe_allow_html=True)
 
-# --- 5. DASHBOARD EXECUTIVO (MÉTRICAS TÉCNICAS) ---
-st.divider()
-c1, c2, c3, c4 = st.columns(4)
-
-c1.metric(
-    label="📦 Ativos Cadastrados", 
-    value=len(st.session_state['db_ativos']), 
-    delta="Base Atualizada", 
-    border=True
-)
-c2.metric(
-    label="🗓️ Inspeções a Vencer", 
-    value="18", 
-    delta="-3", 
-    delta_color="normal", 
-    border=True
-)
-c3.metric(
-    label="⚠️ Alertas Críticos", 
-    value="8", 
-    delta="+2", 
-    delta_color="inverse", 
-    border=True
-)
-c4.metric(
-    label="✅ Conformidade NR 13", 
-    value="88%", 
-    chart_data=[82, 85, 84, 88
+# ---
